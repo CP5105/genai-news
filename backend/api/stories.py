@@ -55,7 +55,7 @@ def get_stories(
                 "_id": 1,
                 "headline": 1,
                 "latest_ref_article_at": 1,
-                "cover_images": 1,
+                "cover_images": {"$slice": 5},
             },
         )
         .sort("latest_ref_article_at", DESCENDING)
@@ -100,7 +100,7 @@ def get_story_detail(story_id: str):
             "headline": 1,
             "summary": 1,
             "latest_ref_article_at": 1,
-            "cover_images": 1,
+            "cover_images": {"$slice": 5},
             "ref_articles.article_id": 1,
             "ref_articles.url": 1,
             "ref_articles.title": 1,
@@ -118,5 +118,5 @@ def get_story_detail(story_id: str):
         "summary": SEGMENTER.segment(doc.get("summary")),
         "cover_images": doc.get("cover_images"),
         "latest_ref_article_at": doc.get("latest_ref_article_at"),
-        "ref_articles": doc.get("ref_articles"),
+        "ref_articles": doc.get("ref_articles")[:5],
     }
