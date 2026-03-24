@@ -320,33 +320,28 @@ button:focus-visible {
   margin-top: 1.8rem;
 }
 
-.detail-timeline-header {
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.detail-timeline-header h2 {
-  font-family: var(--font-display), serif;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--heading);
-  margin: 0;
-}
-
-.detail-timeline-count {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 .detail-timeline-list {
   display: flex;
   flex-direction: column;
   gap: 0.95rem;
+  position: relative;
+}
+
+.detail-timeline-list--connected::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--border-strong) 12%,
+    var(--border-strong) 88%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .detail-timeline-item {
@@ -354,6 +349,8 @@ button:focus-visible {
   grid-template-columns: 14px minmax(0, 1fr);
   gap: 0.9rem;
   align-items: start;
+  position: relative;
+  z-index: 1;
 }
 
 .detail-timeline-marker {
@@ -363,6 +360,8 @@ button:focus-visible {
   border-radius: 999px;
   background: var(--primary);
   box-shadow: 0 0 0 5px var(--primary-glow);
+  position: relative;
+  z-index: 1;
 }
 
 .detail-timeline-card {

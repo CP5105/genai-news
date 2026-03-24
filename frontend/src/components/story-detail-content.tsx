@@ -24,6 +24,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const timelineEvents = story.timeline.filter(
     (event) => event.summary.length > 0,
   );
+  const hasTimelineRail = timelineEvents.length > 1;
 
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
@@ -60,15 +61,11 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
 
           {timelineEvents.length > 0 ? (
             <section className="detail-timeline" aria-label="Story timeline">
-              <div className="detail-timeline-header">
-                <h2>Timeline</h2>
-                <span className="detail-timeline-count">
-                  {timelineEvents.length}{" "}
-                  {timelineEvents.length === 1 ? "update" : "updates"}
-                </span>
-              </div>
+              <h2 className="sr-only">Timeline</h2>
 
-              <div className="detail-timeline-list">
+              <div
+                className={`detail-timeline-list${hasTimelineRail ? " detail-timeline-list--connected" : ""}`}
+              >
                 {timelineEvents.map((event, index) => (
                   <article
                     key={`${story.id}-timeline-${index}`}
