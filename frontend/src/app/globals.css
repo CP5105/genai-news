@@ -375,7 +375,7 @@ button:focus-visible {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 1rem 1.15rem;
+  padding: 1.1rem 1.2rem 1.15rem;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -396,11 +396,18 @@ button:focus-visible {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .detail-timeline-badge {
   color: var(--primary);
+  background: rgba(139, 28, 28, 0.08);
+  border: 1px solid rgba(139, 28, 28, 0.12);
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  line-height: 1.4;
 }
 
 .detail-timeline-summary {
@@ -420,8 +427,8 @@ button:focus-visible {
   position: relative;
   padding-left: 1.1rem;
   font-family: var(--font-body), sans-serif;
-  font-size: 1.04rem;
-  line-height: 1.75;
+  font-size: 0.98rem;
+  line-height: 1.72;
   color: var(--foreground);
 }
 
@@ -430,11 +437,11 @@ button:focus-visible {
   position: absolute;
   left: 0;
   top: 0.65em;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: var(--primary);
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .detail-timeline-summary-item p {
