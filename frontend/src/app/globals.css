@@ -316,25 +316,96 @@ button:focus-visible {
   margin-bottom: 1.6rem;
 }
 
-.detail-summary-item {
-  font-family: var(--font-body), sans-serif;
-  font-size: 1.12rem;
-  line-height: 1.75;
-  color: var(--foreground);
-  position: relative;
-  padding-left: 1.1rem;
+.detail-timeline {
+  margin-top: 1.8rem;
 }
 
-.detail-summary-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.65em;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
+.detail-timeline-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-timeline-header h2 {
+  font-family: var(--font-display), serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--heading);
+  margin: 0;
+}
+
+.detail-timeline-count {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.detail-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.detail-timeline-item {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.detail-timeline-marker {
+  width: 12px;
+  height: 12px;
+  margin-top: 0.42rem;
+  border-radius: 999px;
   background: var(--primary);
-  opacity: 0.55;
+  box-shadow: 0 0 0 5px var(--primary-glow);
+}
+
+.detail-timeline-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem 1.15rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.detail-timeline-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.detail-timeline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.85rem;
+}
+
+.detail-timeline-badge {
+  color: var(--primary);
+}
+
+.detail-timeline-summary {
+  font-family: var(--font-body), sans-serif;
+  font-size: 1.04rem;
+  line-height: 1.75;
+  color: var(--foreground);
+}
+
+.detail-timeline-summary p {
+  margin: 0;
 }
 
 .detail-meta {

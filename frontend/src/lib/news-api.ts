@@ -23,10 +23,17 @@ export type RefArticle = {
   source: string;
 };
 
+export type StoryTimelineEntry = {
+  type: string;
+  created_at: string;
+  event_at: string;
+  summary: string;
+};
+
 export type StoryDetail = {
   id: string;
   headline: string;
-  summary: string[];
+  timeline: StoryTimelineEntry[];
   cover_images: string[];
   latest_ref_article_at: string;
   ref_articles: RefArticle[];
@@ -61,9 +68,9 @@ export async function fetchStories(
 ): Promise<StoriesResponse> {
   const { collections, search, ...init } = options || {};
   let url = `/api/stories?page=${page}`;
-  
+
   if (collections && collections.length > 0) {
-    collections.forEach(c => {
+    collections.forEach((c) => {
       url += `&collections=${encodeURIComponent(c)}`;
     });
   }
@@ -71,7 +78,7 @@ export async function fetchStories(
   if (search) {
     url += `&search=${encodeURIComponent(search)}`;
   }
-  
+
   return fetchJson<StoriesResponse>(url, init);
 }
 

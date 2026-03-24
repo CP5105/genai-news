@@ -16,7 +16,8 @@ export async function generateMetadata({
   try {
     const story = await fetchStoryDetail(id);
     const description =
-      story.summary?.[0] ?? "Read the latest curated GenAI story coverage.";
+      story.timeline?.[0]?.summary ??
+      "Read the latest curated GenAI story coverage.";
 
     return {
       title: story.headline,

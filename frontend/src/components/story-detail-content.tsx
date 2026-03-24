@@ -10,10 +10,18 @@ type StoryDetailContentProps = {
   story: StoryDetail;
 };
 
+function formatTimelineType(value: string): string {
+  if (!value) {
+    return "Update";
+  }
+
+  return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
-  const summaryBullets = story.summary.filter((sentence) => sentence.trim());
+  const timelineEvents = story.timeline.filter((event) => event.summary.trim());
 
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
@@ -44,45 +52,51 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
 
           <h1 className="detail-headline">{story.headline}</h1>
 
-          {summaryBullets.length > 0 ? (
-            <div
-              style={{
-                borderLeft: "2px solid var(--primary-border)",
-                paddingLeft: "1.5rem",
-                marginBottom: "2rem",
-              }}
-            >
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1rem",
-                }}
-              >
-                {summaryBullets.map((sentence, index) => (
-                  <li
-                    key={`${story.id}-summary-${index}`}
-                    className="detail-summary-item"
-                  >
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => <>{children}</>,
-                      }}
-                    >
-                      {sentence}
-                    </ReactMarkdown>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
           <p className="detail-meta">
             Latest reference — {formatDate(story.latest_ref_article_at)}
           </p>
+
+          {timelineEvents.length > 0 ? (
+            <section className="detail-timeline" aria-label="Story timeline">
+              <div className="detail-timeline-header">
+                <h2>Timeline</h2>
+                <span className="detail-timeline-count">
+                  {timelineEvents.length}{" "}
+                  {timelineEvents.length === 1 ? "update" : "updates"}
+                </span>
+              </div>
+
+              <div className="detail-timeline-list">
+                {timelineEvents.map((event, index) => (
+                  <article
+                    key={`${story.id}-timeline-${index}`}
+                    className="detail-timeline-item"
+                  >
+                    <div className="detail-timeline-marker" aria-hidden="true" />
+
+                    <div className="detail-timeline-card">
+                      <div className="detail-timeline-meta">
+                        <span className="detail-timeline-badge">
+                          {formatTimelineType(event.type)}
+                        </span>
+                        <span>{formatDate(event.event_at)}</span>
+                      </div>
+
+                      <div className="detail-timeline-summary">
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => <>{children}</>,
+                          }}
+                        >
+                          {event.summary}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
       </article>
 
