@@ -34,7 +34,7 @@ class StoryTimelineEntry(BaseModel):
     type: str
     created_at: datetime
     event_at: datetime
-    summary: str
+    summary: list[str]
 
 
 class StoryDetail(BaseModel):
