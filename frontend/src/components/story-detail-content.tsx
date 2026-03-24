@@ -15,6 +15,14 @@ function formatTimelineType(value: string): string {
     return "Update";
   }
 
+  if (value === "initial") {
+    return "First report";
+  }
+
+  if (value === "update") {
+    return "Follow-up";
+  }
+
   return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
@@ -54,10 +62,6 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
           <p className="detail-section-label">◆ Story Brief</p>
 
           <h1 className="detail-headline">{story.headline}</h1>
-
-          <p className="detail-meta">
-            Latest reference — {formatDate(story.latest_ref_article_at)}
-          </p>
 
           {timelineEvents.length > 0 ? (
             <section className="detail-timeline" aria-label="Story timeline">

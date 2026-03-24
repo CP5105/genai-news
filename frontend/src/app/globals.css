@@ -392,7 +392,7 @@ button:focus-visible {
   align-items: center;
   gap: 0.55rem;
   font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
+  font-size: 0.82rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
