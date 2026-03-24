@@ -21,7 +21,9 @@ function formatTimelineType(value: string): string {
 export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
-  const timelineEvents = story.timeline.filter((event) => event.summary.trim());
+  const timelineEvents = story.timeline.filter(
+    (event) => event.summary.length > 0,
+  );
 
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
@@ -83,13 +85,22 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
                       </div>
 
                       <div className="detail-timeline-summary">
-                        <ReactMarkdown
-                          components={{
-                            p: ({ children }) => <>{children}</>,
-                          }}
-                        >
-                          {event.summary}
-                        </ReactMarkdown>
+                        <ul className="detail-timeline-summary-list">
+                          {event.summary.map((summaryItem, summaryIndex) => (
+                            <li
+                              key={`${story.id}-timeline-${index}-summary-${summaryIndex}`}
+                              className="detail-timeline-summary-item"
+                            >
+                              <ReactMarkdown
+                                components={{
+                                  p: ({ children }) => <>{children}</>,
+                                }}
+                              >
+                                {summaryItem}
+                              </ReactMarkdown>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </article>

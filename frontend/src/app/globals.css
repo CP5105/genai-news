@@ -398,13 +398,40 @@ button:focus-visible {
 }
 
 .detail-timeline-summary {
+  margin: 0;
+}
+
+.detail-timeline-summary-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+}
+
+.detail-timeline-summary-item {
+  position: relative;
+  padding-left: 1.1rem;
   font-family: var(--font-body), sans-serif;
   font-size: 1.04rem;
   line-height: 1.75;
   color: var(--foreground);
 }
 
-.detail-timeline-summary p {
+.detail-timeline-summary-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.55;
+}
+
+.detail-timeline-summary-item p {
   margin: 0;
 }
 

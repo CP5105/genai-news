@@ -27,7 +27,7 @@ export type StoryTimelineEntry = {
   type: string;
   created_at: string;
   event_at: string;
-  summary: string;
+  summary: string[];
 };
 
 export type StoryDetail = {
