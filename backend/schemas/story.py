@@ -30,10 +30,17 @@ class RefArticle(BaseModel):
     source: str
 
 
+class StoryTimelineEntry(BaseModel):
+    type: str
+    created_at: datetime
+    event_at: datetime
+    summary: str
+
+
 class StoryDetail(BaseModel):
     id: str
     headline: str
-    summary: list[str]
+    timeline: list[StoryTimelineEntry]
     cover_images: list[str]
     latest_ref_article_at: datetime
     ref_articles: list[RefArticle]

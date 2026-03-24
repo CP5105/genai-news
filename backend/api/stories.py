@@ -2,7 +2,6 @@ from typing import Annotated
 import re
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query
-import pysbd
 from pymongo import DESCENDING
 
 from db.mongo import MONGO_COLLECTION, MONGO_DATABASE, mongo_client
@@ -11,7 +10,6 @@ from schemas.story import StoryDetail, StoriesResponse
 router = APIRouter()
 
 PAGE_SIZE = 10
-SEGMENTER = pysbd.Segmenter(language="en", clean=False)
 
 
 @router.get("/stories", response_model=StoriesResponse)
@@ -39,12 +37,12 @@ def get_stories(
 
     if collections:
         query["ref_articles.collection"] = {"$in": collections}
-        
+
     if search:
         escaped_search = re.escape(search)
         query["$or"] = [
             {"headline": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
-            {"summary": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
+            {"timeline.summary": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
         ]
 
     total = collection.count_documents(query)
@@ -98,7 +96,10 @@ def get_story_detail(story_id: str):
         {
             "_id": 1,
             "headline": 1,
-            "summary": 1,
+            "timeline.type": 1,
+            "timeline.created_at": 1,
+            "timeline.event_at": 1,
+            "timeline.summary": 1,
             "latest_ref_article_at": 1,
             "cover_images": {"$slice": 5},
             "ref_articles.article_id": 1,
@@ -115,8 +116,8 @@ def get_story_detail(story_id: str):
     return {
         "id": str(doc.get("_id")),
         "headline": doc.get("headline"),
-        "summary": SEGMENTER.segment(doc.get("summary")),
-        "cover_images": doc.get("cover_images"),
+        "timeline": doc.get("timeline", []),
+        "cover_images": doc.get("cover_images", []),
         "latest_ref_article_at": doc.get("latest_ref_article_at"),
-        "ref_articles": doc.get("ref_articles")[:5],
+        "ref_articles": doc.get("ref_articles", [])[:5],
     }
