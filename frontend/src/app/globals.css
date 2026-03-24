@@ -392,12 +392,12 @@ button:focus-visible {
   align-items: center;
   gap: 0.55rem;
   font-family: var(--font-mono), monospace;
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 1rem;
-  padding-bottom: 0.85rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -418,17 +418,17 @@ button:focus-visible {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 1rem;
   margin: 0;
   padding: 0;
 }
 
 .detail-timeline-summary-item {
   position: relative;
-  padding-left: 1.1rem;
+  padding-left: 1.15rem;
   font-family: var(--font-body), sans-serif;
-  font-size: 0.98rem;
-  line-height: 1.72;
+  font-size: 1.04rem;
+  line-height: 1.78;
   color: var(--foreground);
 }
 
@@ -436,7 +436,7 @@ button:focus-visible {
   content: "";
   position: absolute;
   left: 0;
-  top: 0.65em;
+  top: 0.7em;
   width: 3px;
   height: 3px;
   border-radius: 50%;
