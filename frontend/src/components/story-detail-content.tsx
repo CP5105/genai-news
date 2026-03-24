@@ -69,7 +69,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
                 {timelineEvents.map((event, index) => (
                   <article
                     key={`${story.id}-timeline-${index}`}
-                    className="detail-timeline-item"
+                    className={`detail-timeline-item${index === 0 ? " detail-timeline-item--featured" : ""}`}
                   >
                     <div className="detail-timeline-marker" aria-hidden="true" />
 
