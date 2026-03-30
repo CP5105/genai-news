@@ -208,24 +208,25 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
 
         <div className="p-6 md:p-9 lg:p-11">
           <div className="detail-overview-row mb-5">
-            <p className="detail-section-label mb-0">◆ Overview</p>
+            <div className="detail-overview-labels">
+              <p className="detail-section-label mb-0">◆ Overview</p>
+
+              {activeReadStatusNotice ? (
+                <span className="detail-status-mini" aria-live="polite">
+                  Up to date
+                </span>
+              ) : null}
+            </div>
 
             <div className="detail-status-slot">
               {activeReadStatusNotice ? (
-                <div
-                  className="detail-status-note"
-                  role="status"
-                  aria-live="polite"
+                <button
+                  type="button"
+                  onClick={handleUndoReadStatus}
+                  className="detail-status-action detail-status-action--secondary"
                 >
-                  <p className="detail-status-copy">Up to date</p>
-                  <button
-                    type="button"
-                    onClick={handleUndoReadStatus}
-                    className="detail-status-action"
-                  >
-                    Undo
-                  </button>
-                </div>
+                  Undo
+                </button>
               ) : null}
             </div>
           </div>

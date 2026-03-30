@@ -346,10 +346,18 @@ button:focus-visible {
 
 .detail-overview-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 2.75rem;
+  min-height: 2rem;
+}
+
+.detail-overview-labels {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  min-width: 0;
 }
 
 .detail-status-slot {
@@ -358,28 +366,26 @@ button:focus-visible {
   flex: 0 0 auto;
 }
 
-.detail-status-note {
+.detail-status-mini {
   display: inline-flex;
-  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.65rem 0.95rem;
-  max-width: min(26rem, 100%);
-  padding: 0.75rem 0.95rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--primary);
-  border-radius: 4px;
+  gap: 0.3rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--muted);
   white-space: nowrap;
 }
 
-.detail-status-copy {
-  margin: 0;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  line-height: 1.4;
-  color: var(--heading);
+.detail-status-mini::before {
+  content: "";
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 999px;
+  background: var(--primary);
+  flex: 0 0 auto;
 }
 
 .detail-status-action {
@@ -389,17 +395,27 @@ button:focus-visible {
   color: var(--primary);
   cursor: pointer;
   font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: underline;
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.16em;
   transition: opacity 0.2s ease;
 }
 
-.detail-status-action:hover {
-  opacity: 0.75;
+.detail-status-action--secondary {
+  color: var(--muted);
 }
+
+.detail-status-action:hover {
+  opacity: 0.78;
+}
+
+.detail-status-action:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
 
 .detail-timeline {
   margin-top: 1.8rem;
