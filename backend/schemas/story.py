@@ -7,6 +7,7 @@ class StoryItem(BaseModel):
     id: str
     headline: str
     latest_timeline_event_at: datetime
+    has_follow_up: bool
     cover_images: list[str]
 
 

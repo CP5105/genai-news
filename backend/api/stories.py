@@ -30,7 +30,6 @@ def get_stories(
     page: Annotated[int, Query(ge=1)] = 1,
     collections: Annotated[list[str], Query()] = None,
     search: Annotated[str, Query()] = None,
-    has_follow_up: Annotated[bool, Query()] = False,
 ):
     if not mongo_client or not MONGO_DATABASE or not MONGO_COLLECTION:
         return {
@@ -59,9 +58,6 @@ def get_stories(
             {"timeline.summary": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
         ]
 
-    if has_follow_up:
-        query["timeline.1"] = {"$exists": True}
-
     total = collection.count_documents(query)
     cursor = (
         collection.find(
@@ -70,6 +66,7 @@ def get_stories(
                 "_id": 1,
                 "headline": 1,
                 "latest_timeline_event_at": 1,
+                "timeline": {"$slice": 2},
                 "cover_images": {"$slice": 5},
             },
         )
@@ -83,6 +80,7 @@ def get_stories(
             "id": str(doc.get("_id")),
             "headline": doc.get("headline"),
             "latest_timeline_event_at": doc.get("latest_timeline_event_at"),
+            "has_follow_up": len(doc.get("timeline", [])) > 1,
             "cover_images": doc.get("cover_images", []),
         }
         for doc in cursor
