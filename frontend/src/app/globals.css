@@ -143,19 +143,23 @@ button:focus-visible {
   text-decoration: none;
 }
 
+.story-card-status-slot {
+  min-height: 1.2rem;
+  margin-bottom: 0.55rem;
+}
+
 .story-card-status-badge {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-bottom: 0.9rem;
-  padding: 0.26rem 0.55rem;
+  padding: 0.16rem 0.42rem;
   border: 1px solid var(--primary-border);
   border-radius: 999px;
   background: var(--primary-glow);
   font-family: var(--font-mono), monospace;
-  font-size: 0.64rem;
-  letter-spacing: 0.14em;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--primary);
 }
