@@ -509,15 +509,27 @@ export default function StoryFeed({
             />
 
             <div className="flex flex-1 flex-col p-5">
-              <div className="story-card-status-slot" aria-hidden={!hasUnreadUpdate(story)}>
-                {hasUnreadUpdate(story) ? (
-                  <p className="story-card-status-badge">New Update</p>
-                ) : null}
-              </div>
               <h3 className="story-card-headline">{story.headline}</h3>
-              <p className="story-card-meta mt-auto pt-2">
-                {formatDate(story.latest_timeline_event_at)}
-              </p>
+              <div className="story-card-meta mt-auto pt-2">
+                {hasUnreadUpdate(story) ? (
+                  <>
+                    <span className="story-card-meta-status">
+                      <span
+                        className="story-card-meta-dot"
+                        aria-hidden="true"
+                      />
+                      Updated
+                    </span>
+                    <span
+                      className="story-card-meta-separator"
+                      aria-hidden="true"
+                    >
+                      ·
+                    </span>
+                  </>
+                ) : null}
+                <span>{formatDate(story.latest_timeline_event_at)}</span>
+              </div>
             </div>
           </article>
         ))}

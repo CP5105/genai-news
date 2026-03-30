@@ -207,32 +207,37 @@ button:focus-visible {
   text-decoration: none;
 }
 
-.story-card-status-slot {
-  min-height: 1.2rem;
-  margin-bottom: 0.55rem;
-}
-
-.story-card-status-badge {
-  align-self: flex-start;
-  display: inline-flex;
+.story-card-meta {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.16rem 0.42rem;
-  border: 1px solid var(--primary-border);
-  border-radius: 999px;
-  background: var(--primary-glow);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--primary);
-}
-
-.story-card-meta {
   font-family: var(--font-mono), monospace;
   font-size: 0.82rem;
   letter-spacing: 0.07em;
   color: var(--muted);
+}
+
+.story-card-meta-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  color: var(--primary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+.story-card-meta-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.story-card-meta-separator {
+  color: var(--border-strong);
 }
 
 /* ── Staggered card animation ─────────────────────────── */
