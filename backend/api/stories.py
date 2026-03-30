@@ -30,6 +30,7 @@ def get_stories(
     page: Annotated[int, Query(ge=1)] = 1,
     collections: Annotated[list[str], Query()] = None,
     search: Annotated[str, Query()] = None,
+    has_follow_up: Annotated[bool, Query()] = False,
 ):
     if not mongo_client or not MONGO_DATABASE or not MONGO_COLLECTION:
         return {
@@ -57,6 +58,9 @@ def get_stories(
             {"headline": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
             {"timeline.summary": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
         ]
+
+    if has_follow_up:
+        query["timeline.1"] = {"$exists": True}
 
     total = collection.count_documents(query)
     cursor = (

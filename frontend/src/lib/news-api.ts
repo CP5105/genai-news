@@ -64,9 +64,13 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export async function fetchStories(
   page = 1,
-  options?: { collections?: string[]; search?: string } & RequestInit,
+  options?: {
+    collections?: string[];
+    search?: string;
+    hasFollowUp?: boolean;
+  } & RequestInit,
 ): Promise<StoriesResponse> {
-  const { collections, search, ...init } = options || {};
+  const { collections, search, hasFollowUp, ...init } = options || {};
   let url = `/api/stories?page=${page}`;
 
   if (collections && collections.length > 0) {
@@ -77,6 +81,10 @@ export async function fetchStories(
 
   if (search) {
     url += `&search=${encodeURIComponent(search)}`;
+  }
+
+  if (hasFollowUp) {
+    url += "&has_follow_up=true";
   }
 
   return fetchJson<StoriesResponse>(url, init);
