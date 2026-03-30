@@ -58,7 +58,6 @@ def get_stories(
             {"timeline.summary": {"$regex": f"\\b{escaped_search}\\b", "$options": "i"}},
         ]
 
-    total = collection.count_documents(query)
     cursor = (
         collection.find(
             query,
@@ -72,8 +71,12 @@ def get_stories(
         )
         .sort("latest_timeline_event_at", DESCENDING)
         .skip(skip)
-        .limit(PAGE_SIZE)
+        .limit(PAGE_SIZE + 1)
     )
+
+    docs = list(cursor)
+    has_next = len(docs) > PAGE_SIZE
+    page_docs = docs[:PAGE_SIZE]
 
     items = [
         {
@@ -83,7 +86,7 @@ def get_stories(
             "has_follow_up": len(doc.get("timeline", [])) > 1,
             "cover_images": doc.get("cover_images", []),
         }
-        for doc in cursor
+        for doc in page_docs
     ]
 
     return {
@@ -91,8 +94,8 @@ def get_stories(
         "pagination": {
             "page": page,
             "page_size": PAGE_SIZE,
-            "total": total,
-            "has_next": skip + PAGE_SIZE < total,
+            "total": skip + len(items) + (1 if has_next else 0),
+            "has_next": has_next,
         },
     }
 
