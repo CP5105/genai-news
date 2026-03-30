@@ -182,7 +182,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
 
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
-      <div className="mb-7 space-y-3">
+      <div className="mb-7">
         <button
           type="button"
           onClick={() => router.back()}
@@ -191,20 +191,6 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
           <span aria-hidden="true">←</span>
           Back
         </button>
-
-        {activeReadStatusNotice ? (
-          <div className="detail-status-note" role="status" aria-live="polite">
-            <span className="detail-status-kicker">Status</span>
-            <p className="detail-status-copy">Up to date</p>
-            <button
-              type="button"
-              onClick={handleUndoReadStatus}
-              className="detail-status-action"
-            >
-              Undo
-            </button>
-          </div>
-        ) : null}
       </div>
 
       <article className="detail-article">
@@ -219,6 +205,24 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
         />
 
         <div className="p-6 md:p-9 lg:p-11">
+          {activeReadStatusNotice ? (
+            <div
+              className="detail-status-note mb-5"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="detail-status-kicker">Status</span>
+              <p className="detail-status-copy">Up to date</p>
+              <button
+                type="button"
+                onClick={handleUndoReadStatus}
+                className="detail-status-action"
+              >
+                Undo
+              </button>
+            </div>
+          ) : null}
+
           <p className="detail-section-label">◆ Overview</p>
 
           <h1 className="detail-headline">{story.headline}</h1>
