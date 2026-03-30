@@ -349,7 +349,7 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
-  width: min(22rem, calc(100vw - 1.5rem));
+  width: min(18rem, calc(100vw - 1.5rem));
   padding: 0.75rem 0.9rem;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -394,6 +394,25 @@ button:focus-visible {
 .detail-toast-action:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .detail-toast {
+    width: min(20rem, calc(100vw - 1rem));
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .detail-toast-copy {
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .detail-toast-action {
+    margin-inline: auto;
+  }
 }
 
 .detail-timeline {
