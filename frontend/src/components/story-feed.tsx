@@ -7,6 +7,57 @@ import StoryImageCarousel from "@/components/story-image-carousel";
 import SourceDropdown from "@/components/source-dropdown";
 import { SOURCE_MAP } from "@/lib/constants";
 
+type PersistedStoryFeedState = {
+  version: 2;
+  items: StoryItem[];
+  page: number;
+  hasNext: boolean;
+  selectedCollections: string[];
+  searchQuery: string;
+  searchInput: string;
+  activeImageByStory: Record<string, number>;
+  scrollY?: number;
+};
+
+const STORY_FEED_STORAGE_KEY = "genai-news:story-feed-state";
+
+function readPersistedStoryFeedState(): PersistedStoryFeedState | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.sessionStorage.getItem(STORY_FEED_STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as PersistedStoryFeedState;
+    if (parsed.version !== 2) {
+      return null;
+    }
+
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function savePersistedStoryFeedState(state: PersistedStoryFeedState) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(
+      STORY_FEED_STORAGE_KEY,
+      JSON.stringify(state),
+    );
+  } catch {
+    // Ignore storage quota and privacy-mode failures.
+  }
+}
+
 type StoryFeedProps = {
   initialItems: StoryItem[];
   initialPage: number;
@@ -33,12 +84,58 @@ export default function StoryFeed({
   const [activeImageByStory, setActiveImageByStory] = useState<
     Record<string, number>
   >({});
+  const [hasHydratedState, setHasHydratedState] = useState(false);
+  const [pendingScrollRestore, setPendingScrollRestore] = useState<number | null>(
+    null,
+  );
 
-  const isFirstRender = useRef(true);
+  const previousFilterKeyRef = useRef<string | null>(null);
 
   const setActiveImage = (storyId: string, index: number) => {
     setActiveImageByStory((prev) => ({ ...prev, [storyId]: index }));
   };
+
+  const buildPersistedState = useCallback(
+    (scrollY?: number): PersistedStoryFeedState => ({
+      version: 2,
+      items,
+      page,
+      hasNext,
+      selectedCollections,
+      searchQuery,
+      searchInput,
+      activeImageByStory,
+      scrollY,
+    }),
+    [
+      activeImageByStory,
+      hasNext,
+      items,
+      page,
+      searchInput,
+      searchQuery,
+      selectedCollections,
+    ],
+  );
+
+  useEffect(() => {
+    const storedState = readPersistedStoryFeedState();
+
+    if (storedState) {
+      setItems(storedState.items);
+      setPage(storedState.page);
+      setHasNext(storedState.hasNext);
+      setSelectedCollections(storedState.selectedCollections);
+      setSearchQuery(storedState.searchQuery);
+      setSearchInput(storedState.searchInput);
+      setActiveImageByStory(storedState.activeImageByStory);
+      if (typeof storedState.scrollY === "number") {
+        setPendingScrollRestore(storedState.scrollY);
+      }
+    }
+
+    setHasHydratedState(true);
+  }, []);
 
   const getFetchOptions = useCallback(() => {
     const allSelected = selectedCollections.length === Object.keys(SOURCE_MAP).length;
@@ -108,12 +205,26 @@ export default function StoryFeed({
     }
   };
 
-  // Automatically fetch when filters change, but skip initial render
+  const filterKey = JSON.stringify({
+    selectedCollections,
+    searchQuery: searchQuery.trim(),
+  });
+
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (!hasHydratedState) {
       return;
     }
+
+    if (previousFilterKeyRef.current === null) {
+      previousFilterKeyRef.current = filterKey;
+      return;
+    }
+
+    if (previousFilterKeyRef.current === filterKey) {
+      return;
+    }
+
+    previousFilterKeyRef.current = filterKey;
 
     let isActive = true;
 
@@ -156,9 +267,35 @@ export default function StoryFeed({
     return () => {
       isActive = false;
     };
-  }, [selectedCollections, getFetchOptions]);
+  }, [filterKey, getFetchOptions, hasHydratedState, selectedCollections.length]);
+
+  useEffect(() => {
+    if (pendingScrollRestore === null || typeof window === "undefined") {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: pendingScrollRestore, behavior: "auto" });
+      setPendingScrollRestore(null);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [items.length, pendingScrollRestore]);
+
+  useEffect(() => {
+    if (!hasHydratedState) {
+      return;
+    }
+
+    savePersistedStoryFeedState(buildPersistedState(window.scrollY));
+  }, [buildPersistedState, hasHydratedState]);
 
   const handleCardNavigate = (storyId: string) => {
+    if (typeof window !== "undefined") {
+      savePersistedStoryFeedState(buildPersistedState(window.scrollY));
+    }
     router.push(`/story/${storyId}`);
   };
 
