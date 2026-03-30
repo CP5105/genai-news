@@ -69,6 +69,70 @@ button:focus-visible {
   background: var(--border);
 }
 
+/* ── Toast ───────────────────────────────────────────── */
+
+.genai-toast {
+  position: relative;
+  overflow: hidden;
+  padding: 0.9rem 1rem 0.85rem;
+}
+
+.genai-toast::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+}
+
+.genai-toast-content {
+  gap: 0.18rem;
+}
+
+.genai-toast-title {
+  font-family: var(--font-display), serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--heading);
+  letter-spacing: 0.01em;
+}
+
+.genai-toast-description {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.genai-toast-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.42rem 0.72rem;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.genai-toast-action:hover {
+  color: var(--primary);
+  border-color: var(--primary-border);
+  background: var(--primary-glow);
+}
+
 /* ── Story card ───────────────────────────────────────── */
 
 .story-card {

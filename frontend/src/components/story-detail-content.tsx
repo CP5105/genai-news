@@ -104,7 +104,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
       });
 
       toast("Marked up to date", {
-        description: "This story will no longer be highlighted on the homepage.",
+        description: "We’ll highlight it again if there’s a new update.",
         action: {
           label: "Undo",
           onClick: () => {
