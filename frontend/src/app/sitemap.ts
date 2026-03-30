@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const response = await fetchStories(1);
     const storyRoutes = response.items.map((story) => ({
       url: `${SITE_URL}/story/${story.id}`,
-      lastModified: new Date(story.latest_ref_article_at),
+      lastModified: new Date(story.latest_timeline_event_at),
       changeFrequency: "daily" as const,
       priority: 0.7,
     }));

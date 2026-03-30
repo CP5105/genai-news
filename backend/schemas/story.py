@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class StoryItem(BaseModel):
     id: str
     headline: str
-    latest_ref_article_at: datetime
+    latest_timeline_event_at: datetime
     cover_images: list[str]
 
 
@@ -42,5 +42,5 @@ class StoryDetail(BaseModel):
     headline: str
     timeline: list[StoryTimelineEntry]
     cover_images: list[str]
-    latest_ref_article_at: datetime
+    latest_timeline_event_at: datetime
     ref_articles: list[RefArticle]

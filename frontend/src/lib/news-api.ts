@@ -1,7 +1,7 @@
 export type StoryItem = {
   id: string;
   headline: string;
-  latest_ref_article_at: string;
+  latest_timeline_event_at: string;
   cover_images: string[];
 };
 
@@ -35,7 +35,7 @@ export type StoryDetail = {
   headline: string;
   timeline: StoryTimelineEntry[];
   cover_images: string[];
-  latest_ref_article_at: string;
+  latest_timeline_event_at: string;
   ref_articles: RefArticle[];
 };
 

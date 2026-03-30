@@ -8,7 +8,7 @@ import SourceDropdown from "@/components/source-dropdown";
 import { SOURCE_MAP } from "@/lib/constants";
 
 type PersistedStoryFeedState = {
-  version: 2;
+  version: 3;
   items: StoryItem[];
   page: number;
   hasNext: boolean;
@@ -33,7 +33,7 @@ function readPersistedStoryFeedState(): PersistedStoryFeedState | null {
     }
 
     const parsed = JSON.parse(raw) as PersistedStoryFeedState;
-    if (parsed.version !== 2) {
+    if (parsed.version !== 3) {
       return null;
     }
 
@@ -97,7 +97,7 @@ export default function StoryFeed({
 
   const buildPersistedState = useCallback(
     (scrollY?: number): PersistedStoryFeedState => ({
-      version: 2,
+      version: 3,
       items,
       page,
       hasNext,
@@ -458,7 +458,7 @@ export default function StoryFeed({
             <div className="flex flex-1 flex-col p-5">
               <h3 className="story-card-headline">{story.headline}</h3>
               <p className="story-card-meta mt-auto pt-2">
-                {formatDate(story.latest_ref_article_at)}
+                {formatDate(story.latest_timeline_event_at)}
               </p>
             </div>
           </article>

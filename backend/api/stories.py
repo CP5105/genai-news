@@ -78,8 +78,8 @@ def get_stories(
         {
             "id": str(doc.get("_id")),
             "headline": doc.get("headline"),
-            "latest_ref_article_at": doc.get("latest_ref_article_at"),
-            "cover_images": doc.get("cover_images"),
+            "latest_timeline_event_at": doc.get("latest_ref_article_at"),
+            "cover_images": doc.get("cover_images", []),
         }
         for doc in cursor
     ]
@@ -142,6 +142,6 @@ def get_story_detail(story_id: str):
         "headline": doc.get("headline"),
         "timeline": timeline,
         "cover_images": doc.get("cover_images", []),
-        "latest_ref_article_at": doc.get("latest_ref_article_at"),
+        "latest_timeline_event_at": doc.get("latest_ref_article_at"),
         "ref_articles": doc.get("ref_articles", [])[:5],
     }
