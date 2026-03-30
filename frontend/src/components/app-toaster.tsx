@@ -6,8 +6,13 @@ export function AppToaster() {
   return (
     <Toaster
       position="bottom-center"
-      gutter={12}
-      containerStyle={{ bottom: 20 }}
+      gutter={10}
+      containerStyle={{
+        bottom: "1rem",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+      }}
       toastOptions={{
         duration: 5000,
       }}

@@ -222,9 +222,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
         />
 
         <div className="p-6 md:p-9 lg:p-11">
-          <div className="detail-overview-row mb-5">
-            <p className="detail-section-label mb-0">◆ Overview</p>
-          </div>
+          <p className="detail-section-label">◆ Overview</p>
 
           <h1 className="detail-headline">{story.headline}</h1>
 
