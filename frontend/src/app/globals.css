@@ -355,20 +355,14 @@ button:focus-visible {
   border-radius: 4px;
 }
 
-.detail-status-kicker {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--primary);
-}
-
 .detail-status-copy {
   margin: 0;
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.94rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   line-height: 1.4;
-  color: var(--foreground);
+  color: var(--heading);
 }
 
 .detail-status-action {

@@ -211,7 +211,6 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
               role="status"
               aria-live="polite"
             >
-              <span className="detail-status-kicker">Status</span>
               <p className="detail-status-copy">Up to date</p>
               <button
                 type="button"
