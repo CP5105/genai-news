@@ -356,19 +356,6 @@ button:focus-visible {
   border-top: 3px solid var(--primary);
   border-radius: 4px;
   box-shadow: 0 16px 36px rgba(26, 20, 16, 0.12);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-}
-
-.detail-toast--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.detail-toast--hidden {
-  opacity: 0;
-  transform: translateY(10px);
 }
 
 .detail-toast-copy {

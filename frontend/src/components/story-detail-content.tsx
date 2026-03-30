@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { formatDate, type StoryDetail } from "@/lib/news-api";
 import {
@@ -39,7 +39,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const timelineSectionRef = useRef<HTMLElement | null>(null);
   const hasAutoMarkedRef = useRef(false);
   const autoMarkDisabledRef = useRef(false);
-  const activeReadStatusToastIdRef = useRef<string | null>(null);
+  const activeReadStatusToastIdRef = useRef<string | number | null>(null);
   const timelineEvents = story.timeline.filter(
     (event) => event.summary.length > 0,
   );
@@ -128,12 +128,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
 
       dismissActiveReadStatusToast();
       activeReadStatusToastIdRef.current = toast.custom(
-        (t) => (
-          <ReadStatusToast
-            visible={t.visible}
-            onUndo={() => handleUndoReadStatus(previousEntry)}
-          />
-        ),
+        () => <ReadStatusToast onUndo={() => handleUndoReadStatus(previousEntry)} />,
         { duration: 5000 },
       );
     };
