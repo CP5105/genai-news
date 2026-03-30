@@ -3,16 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { toast } from "sonner";
 import { formatDate, type StoryDetail } from "@/lib/news-api";
 import {
   getStoryReadStateEntry,
   setStoryReadStateEntry,
+  type StoryReadStateEntry,
 } from "@/lib/story-read-state";
 import StoryImageCarousel from "@/components/story-image-carousel";
 
 type StoryDetailContentProps = {
   story: StoryDetail;
+};
+
+type ReadStatusNotice = {
+  storyId: string;
+  previousEntry: StoryReadStateEntry | null;
 };
 
 function formatTimelineType(value: string): string {
@@ -34,16 +39,22 @@ function formatTimelineType(value: string): string {
 export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
+  const [readStatusNotice, setReadStatusNotice] =
+    useState<ReadStatusNotice | null>(null);
   const timelineSectionRef = useRef<HTMLElement | null>(null);
   const hasAutoMarkedRef = useRef(false);
+  const autoMarkDisabledRef = useRef(false);
   const timelineEvents = story.timeline.filter(
     (event) => event.summary.length > 0,
   );
   const hasFollowUp = story.timeline.length > 1;
   const hasTimelineRail = timelineEvents.length > 1;
+  const activeReadStatusNotice =
+    readStatusNotice?.storyId === story.id ? readStatusNotice : null;
 
   useEffect(() => {
     hasAutoMarkedRef.current = false;
+    autoMarkDisabledRef.current = false;
 
     if (
       typeof window === "undefined" ||
@@ -80,7 +91,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
     };
 
     const maybeMarkUpToDate = () => {
-      if (hasAutoMarkedRef.current) {
+      if (hasAutoMarkedRef.current || autoMarkDisabledRef.current) {
         return;
       }
 
@@ -102,15 +113,9 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
       setStoryReadStateEntry(story.id, {
         seenLatestTimelineEventAt: story.latest_timeline_event_at,
       });
-
-      toast("Marked up to date", {
-        description: "We’ll highlight it again if there’s a new update.",
-        action: {
-          label: "Undo",
-          onClick: () => {
-            setStoryReadStateEntry(story.id, previousEntry);
-          },
-        },
+      setReadStatusNotice({
+        storyId: story.id,
+        previousEntry,
       });
     };
 
@@ -164,9 +169,20 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
     };
   }, [hasFollowUp, story.id, story.latest_timeline_event_at]);
 
+  const handleUndoReadStatus = () => {
+    if (!activeReadStatusNotice) {
+      return;
+    }
+
+    autoMarkDisabledRef.current = true;
+    hasAutoMarkedRef.current = true;
+    setStoryReadStateEntry(story.id, activeReadStatusNotice.previousEntry);
+    setReadStatusNotice(null);
+  };
+
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
-      <div className="mb-7">
+      <div className="mb-7 space-y-3">
         <button
           type="button"
           onClick={() => router.back()}
@@ -175,6 +191,20 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
           <span aria-hidden="true">←</span>
           Back
         </button>
+
+        {activeReadStatusNotice ? (
+          <div className="detail-status-note" role="status" aria-live="polite">
+            <span className="detail-status-kicker">Status</span>
+            <p className="detail-status-copy">Up to date on this story</p>
+            <button
+              type="button"
+              onClick={handleUndoReadStatus}
+              className="detail-status-action"
+            >
+              Undo
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <article className="detail-article">

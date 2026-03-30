@@ -69,70 +69,6 @@ button:focus-visible {
   background: var(--border);
 }
 
-/* ── Toast ───────────────────────────────────────────── */
-
-.genai-toast {
-  position: relative;
-  overflow: hidden;
-  padding: 0.9rem 1rem 0.85rem;
-}
-
-.genai-toast::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--primary);
-}
-
-.genai-toast-content {
-  gap: 0.18rem;
-}
-
-.genai-toast-title {
-  font-family: var(--font-display), serif;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--heading);
-  letter-spacing: 0.01em;
-}
-
-.genai-toast-description {
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.84rem;
-  line-height: 1.45;
-  color: var(--muted);
-}
-
-.genai-toast-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: auto;
-  border: 1px solid var(--border-strong);
-  border-radius: 2px;
-  background: var(--surface);
-  color: var(--foreground);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.66rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.42rem 0.72rem;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
-}
-
-.genai-toast-action:hover {
-  color: var(--primary);
-  border-color: var(--primary-border);
-  background: var(--primary-glow);
-}
-
 /* ── Story card ───────────────────────────────────────── */
 
 .story-card {
@@ -404,6 +340,54 @@ button:focus-visible {
   line-height: 1.2;
   color: var(--heading);
   margin-bottom: 1.6rem;
+}
+
+.detail-status-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.95rem;
+  padding: 0.75rem 0.95rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 4px;
+}
+
+.detail-status-kicker {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.detail-status-copy {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.94rem;
+  line-height: 1.4;
+  color: var(--foreground);
+}
+
+.detail-status-action {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  transition: opacity 0.2s ease;
+}
+
+.detail-status-action:hover {
+  opacity: 0.75;
 }
 
 .detail-timeline {
