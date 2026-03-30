@@ -46,7 +46,7 @@ def get_stories(
     assert MONGO_COLLECTION is not None
     skip = (page - 1) * PAGE_SIZE
     collection = mongo_client[MONGO_DATABASE][MONGO_COLLECTION]
-    query = {"is_active": True, "is_visible": True}
+    query = {"is_visible": True}
 
     if collections:
         query["ref_articles.collection"] = {"$in": collections}
@@ -105,7 +105,7 @@ def get_story_detail(story_id: str):
 
     collection = mongo_client[MONGO_DATABASE][MONGO_COLLECTION]
     doc = collection.find_one(
-        {"_id": ObjectId(story_id), "is_active": True, "is_visible": True},
+        {"_id": ObjectId(story_id), "is_visible": True},
         {
             "_id": 1,
             "headline": 1,
