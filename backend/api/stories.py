@@ -65,11 +65,11 @@ def get_stories(
             {
                 "_id": 1,
                 "headline": 1,
-                "latest_ref_article_at": 1,
+                "latest_timeline_event_at": 1,
                 "cover_images": {"$slice": 5},
             },
         )
-        .sort("latest_ref_article_at", DESCENDING)
+        .sort("latest_timeline_event_at", DESCENDING)
         .skip(skip)
         .limit(PAGE_SIZE)
     )
@@ -78,7 +78,7 @@ def get_stories(
         {
             "id": str(doc.get("_id")),
             "headline": doc.get("headline"),
-            "latest_timeline_event_at": doc.get("latest_ref_article_at"),
+            "latest_timeline_event_at": doc.get("latest_timeline_event_at"),
             "cover_images": doc.get("cover_images", []),
         }
         for doc in cursor
@@ -113,7 +113,7 @@ def get_story_detail(story_id: str):
             "timeline.created_at": 1,
             "timeline.event_at": 1,
             "timeline.summary": 1,
-            "latest_ref_article_at": 1,
+            "latest_timeline_event_at": 1,
             "cover_images": {"$slice": 5},
             "ref_articles.article_id": 1,
             "ref_articles.url": 1,
@@ -142,6 +142,6 @@ def get_story_detail(story_id: str):
         "headline": doc.get("headline"),
         "timeline": timeline,
         "cover_images": doc.get("cover_images", []),
-        "latest_timeline_event_at": doc.get("latest_ref_article_at"),
+        "latest_timeline_event_at": doc.get("latest_timeline_event_at"),
         "ref_articles": doc.get("ref_articles", [])[:5],
     }
