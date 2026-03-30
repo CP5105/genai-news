@@ -1,11 +1,67 @@
 "use client";
 
-import { type KeyboardEvent, useState, useEffect, useRef, useCallback } from "react";
+import {
+  type KeyboardEvent,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import { type StoryItem, fetchStories, formatDate } from "@/lib/news-api";
 import StoryImageCarousel from "@/components/story-image-carousel";
 import SourceDropdown from "@/components/source-dropdown";
 import { SOURCE_MAP } from "@/lib/constants";
+
+type PersistedStoryFeedState = {
+  version: 1;
+  items: StoryItem[];
+  page: number;
+  hasNext: boolean;
+  selectedCollections: string[];
+  searchQuery: string;
+  searchInput: string;
+  activeImageByStory: Record<string, number>;
+};
+
+const STORY_FEED_STORAGE_KEY = "genai-news:story-feed-state";
+
+function readPersistedStoryFeedState(): PersistedStoryFeedState | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.sessionStorage.getItem(STORY_FEED_STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as PersistedStoryFeedState;
+    if (parsed.version !== 1) {
+      return null;
+    }
+
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function savePersistedStoryFeedState(state: PersistedStoryFeedState) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(
+      STORY_FEED_STORAGE_KEY,
+      JSON.stringify(state),
+    );
+  } catch {
+    // Ignore storage quota and privacy-mode failures.
+  }
+}
 
 type StoryFeedProps = {
   initialItems: StoryItem[];
@@ -24,7 +80,8 @@ export default function StoryFeed({
   const [items, setItems] = useState<StoryItem[]>(initialItems);
   const [page, setPage] = useState(initialPage);
   const [hasNext, setHasNext] = useState(initialHasNext);
-  const [selectedCollections, setSelectedCollections] = useState<string[]>(initialCollections);
+  const [selectedCollections, setSelectedCollections] =
+    useState<string[]>(initialCollections);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +90,7 @@ export default function StoryFeed({
   const [activeImageByStory, setActiveImageByStory] = useState<
     Record<string, number>
   >({});
+  const [hasRestoredState, setHasRestoredState] = useState(false);
 
   const isFirstRender = useRef(true);
 
@@ -40,9 +98,54 @@ export default function StoryFeed({
     setActiveImageByStory((prev) => ({ ...prev, [storyId]: index }));
   };
 
+  useEffect(() => {
+    const storedState = readPersistedStoryFeedState();
+
+    if (storedState) {
+      setItems(storedState.items);
+      setPage(storedState.page);
+      setHasNext(storedState.hasNext);
+      setSelectedCollections(storedState.selectedCollections);
+      setSearchQuery(storedState.searchQuery);
+      setSearchInput(storedState.searchInput);
+      setActiveImageByStory(storedState.activeImageByStory);
+    }
+
+    setHasRestoredState(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasRestoredState) {
+      return;
+    }
+
+    savePersistedStoryFeedState({
+      version: 1,
+      items,
+      page,
+      hasNext,
+      selectedCollections,
+      searchQuery,
+      searchInput,
+      activeImageByStory,
+    });
+  }, [
+    activeImageByStory,
+    hasRestoredState,
+    hasNext,
+    items,
+    page,
+    searchInput,
+    searchQuery,
+    selectedCollections,
+  ]);
+
   const getFetchOptions = useCallback(() => {
-    const allSelected = selectedCollections.length === Object.keys(SOURCE_MAP).length;
-    const options: { collections?: string[]; search?: string } = allSelected ? {} : { collections: selectedCollections };
+    const allSelected =
+      selectedCollections.length === Object.keys(SOURCE_MAP).length;
+    const options: { collections?: string[]; search?: string } = allSelected
+      ? {}
+      : { collections: selectedCollections };
     if (searchQuery.trim()) {
       options.search = searchQuery.trim();
     }
@@ -94,7 +197,10 @@ export default function StoryFeed({
     setLoadError("");
 
     try {
-      const response = await fetchStories(1, { ...getFetchOptions(), cache: "no-store" });
+      const response = await fetchStories(1, {
+        ...getFetchOptions(),
+        cache: "no-store",
+      });
       setItems(response.items);
       setPage(response.pagination.page);
       setHasNext(response.pagination.has_next);
@@ -133,14 +239,14 @@ export default function StoryFeed({
       try {
         const response = await fetchStories(1, getFetchOptions());
         if (!isActive) return;
-        
+
         setItems(response.items);
         setPage(response.pagination.page);
         setHasNext(response.pagination.has_next);
         setActiveImageByStory({});
       } catch (error) {
         if (!isActive) return;
-        
+
         setLoadError(
           error instanceof Error ? error.message : "Failed to filter stories",
         );
@@ -181,10 +287,20 @@ export default function StoryFeed({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <form onSubmit={handleSearch} className="flex-1 sm:flex-none relative group flex items-center">
-            <svg 
-              className="absolute left-3 text-[var(--muted)] group-focus-within:text-[var(--primary)] transition-colors" 
-              viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          <form
+            onSubmit={handleSearch}
+            className="flex-1 sm:flex-none relative group flex items-center"
+          >
+            <svg
+              className="absolute left-3 text-[var(--muted)] group-focus-within:text-[var(--primary)] transition-colors"
+              viewBox="0 0 24 24"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -202,8 +318,8 @@ export default function StoryFeed({
               }}
             />
             {searchInput && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => {
                   setSearchInput("");
                   setSearchQuery("");
@@ -211,7 +327,16 @@ export default function StoryFeed({
                 className="absolute right-2.5 text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
                 aria-label="Clear search"
               >
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -229,32 +354,32 @@ export default function StoryFeed({
             className="btn-ghost"
           >
             <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            style={{
-              width: "0.85rem",
-              height: "0.85rem",
-            }}
-            className={isRefreshing ? "animate-spin" : ""}
-          >
-            <path
-              d="M20 12a8 8 0 1 1-2.34-5.66"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M20 4v6h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {isRefreshing ? "Refreshing" : "Refresh"}
-        </button>
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              style={{
+                width: "0.85rem",
+                height: "0.85rem",
+              }}
+              className={isRefreshing ? "animate-spin" : ""}
+            >
+              <path
+                d="M20 12a8 8 0 1 1-2.34-5.66"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M20 4v6h-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {isRefreshing ? "Refreshing" : "Refresh"}
+          </button>
         </div>
       </div>
 
@@ -266,7 +391,8 @@ export default function StoryFeed({
             </span>
           ) : searchQuery ? (
             <span className="text-gray-500">
-              No dispatches found matching &quot;{searchQuery}&quot;. Try different keywords.
+              No dispatches found matching &quot;{searchQuery}&quot;. Try
+              different keywords.
             </span>
           ) : (
             "No dispatches available."
