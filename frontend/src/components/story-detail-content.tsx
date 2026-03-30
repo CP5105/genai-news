@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import { formatDate, type StoryDetail } from "@/lib/news-api";
 import {
@@ -10,14 +11,10 @@ import {
   type StoryReadStateEntry,
 } from "@/lib/story-read-state";
 import StoryImageCarousel from "@/components/story-image-carousel";
+import { ReadStatusToast } from "@/components/read-status-toast";
 
 type StoryDetailContentProps = {
   story: StoryDetail;
-};
-
-type ReadStatusNotice = {
-  storyId: string;
-  previousEntry: StoryReadStateEntry | null;
 };
 
 function formatTimelineType(value: string): string {
@@ -39,22 +36,37 @@ function formatTimelineType(value: string): string {
 export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
-  const [readStatusNotice, setReadStatusNotice] =
-    useState<ReadStatusNotice | null>(null);
   const timelineSectionRef = useRef<HTMLElement | null>(null);
   const hasAutoMarkedRef = useRef(false);
   const autoMarkDisabledRef = useRef(false);
+  const activeReadStatusToastIdRef = useRef<string | null>(null);
   const timelineEvents = story.timeline.filter(
     (event) => event.summary.length > 0,
   );
   const hasFollowUp = story.timeline.length > 1;
   const hasTimelineRail = timelineEvents.length > 1;
-  const activeReadStatusNotice =
-    readStatusNotice?.storyId === story.id ? readStatusNotice : null;
+
+  const dismissActiveReadStatusToast = useCallback(() => {
+    if (activeReadStatusToastIdRef.current) {
+      toast.dismiss(activeReadStatusToastIdRef.current);
+      activeReadStatusToastIdRef.current = null;
+    }
+  }, []);
+
+  const handleUndoReadStatus = useCallback(
+    (previousEntry: StoryReadStateEntry | null) => {
+      autoMarkDisabledRef.current = true;
+      hasAutoMarkedRef.current = true;
+      setStoryReadStateEntry(story.id, previousEntry);
+      dismissActiveReadStatusToast();
+    },
+    [dismissActiveReadStatusToast, story.id],
+  );
 
   useEffect(() => {
     hasAutoMarkedRef.current = false;
     autoMarkDisabledRef.current = false;
+    dismissActiveReadStatusToast();
 
     if (
       typeof window === "undefined" ||
@@ -113,10 +125,17 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
       setStoryReadStateEntry(story.id, {
         seenLatestTimelineEventAt: story.latest_timeline_event_at,
       });
-      setReadStatusNotice({
-        storyId: story.id,
-        previousEntry,
-      });
+
+      dismissActiveReadStatusToast();
+      activeReadStatusToastIdRef.current = toast.custom(
+        (t) => (
+          <ReadStatusToast
+            visible={t.visible}
+            onUndo={() => handleUndoReadStatus(previousEntry)}
+          />
+        ),
+        { duration: 5000 },
+      );
     };
 
     const handleScroll = () => {
@@ -166,19 +185,15 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      dismissActiveReadStatusToast();
     };
-  }, [hasFollowUp, story.id, story.latest_timeline_event_at]);
-
-  const handleUndoReadStatus = () => {
-    if (!activeReadStatusNotice) {
-      return;
-    }
-
-    autoMarkDisabledRef.current = true;
-    hasAutoMarkedRef.current = true;
-    setStoryReadStateEntry(story.id, activeReadStatusNotice.previousEntry);
-    setReadStatusNotice(null);
-  };
+  }, [
+    dismissActiveReadStatusToast,
+    handleUndoReadStatus,
+    hasFollowUp,
+    story.id,
+    story.latest_timeline_event_at,
+  ]);
 
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
@@ -208,27 +223,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
 
         <div className="p-6 md:p-9 lg:p-11">
           <div className="detail-overview-row mb-5">
-            <div className="detail-overview-labels">
-              <p className="detail-section-label mb-0">◆ Overview</p>
-
-              {activeReadStatusNotice ? (
-                <span className="detail-status-mini" aria-live="polite">
-                  Up to date
-                </span>
-              ) : null}
-            </div>
-
-            <div className="detail-status-slot">
-              {activeReadStatusNotice ? (
-                <button
-                  type="button"
-                  onClick={handleUndoReadStatus}
-                  className="detail-status-action detail-status-action--secondary"
-                >
-                  Undo
-                </button>
-              ) : null}
-            </div>
+            <p className="detail-section-label mb-0">◆ Overview</p>
           </div>
 
           <h1 className="detail-headline">{story.headline}</h1>

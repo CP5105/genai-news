@@ -346,56 +346,61 @@ button:focus-visible {
 
 .detail-overview-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 2rem;
+  min-height: 2.75rem;
 }
 
-.detail-overview-labels {
+.detail-toast {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--primary);
+  border-radius: 4px;
+  box-shadow: 0 16px 36px rgba(26, 20, 16, 0.12);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.detail-toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.detail-toast--hidden {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.detail-toast-copy {
   min-width: 0;
 }
 
-.detail-status-slot {
-  display: flex;
-  justify-content: flex-end;
-  flex: 0 0 auto;
-}
-
-.detail-status-mini {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+.detail-toast-label {
+  margin: 0;
   font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  line-height: 1;
-  color: var(--muted);
-  white-space: nowrap;
+  line-height: 1.4;
+  color: var(--heading);
 }
 
-.detail-status-mini::before {
-  content: "";
-  width: 0.32rem;
-  height: 0.32rem;
-  border-radius: 999px;
-  background: var(--primary);
-  flex: 0 0 auto;
-}
-
-.detail-status-action {
+.detail-toast-action {
   padding: 0;
   border: 0;
   background: transparent;
   color: var(--primary);
   cursor: pointer;
   font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: underline;
@@ -403,19 +408,14 @@ button:focus-visible {
   transition: opacity 0.2s ease;
 }
 
-.detail-status-action--secondary {
-  color: var(--muted);
-}
-
-.detail-status-action:hover {
+.detail-toast-action:hover {
   opacity: 0.78;
 }
 
-.detail-status-action:focus-visible {
+.detail-toast-action:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
-
 
 .detail-timeline {
   margin-top: 1.8rem;
