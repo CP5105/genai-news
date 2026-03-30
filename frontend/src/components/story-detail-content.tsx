@@ -195,7 +195,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
         {activeReadStatusNotice ? (
           <div className="detail-status-note" role="status" aria-live="polite">
             <span className="detail-status-kicker">Status</span>
-            <p className="detail-status-copy">Up to date on this story</p>
+            <p className="detail-status-copy">Up to date</p>
             <button
               type="button"
               onClick={handleUndoReadStatus}
