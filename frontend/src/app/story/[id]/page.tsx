@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { fetchStoryDetail } from "@/lib/news-api";
 import StoryDetailContent from "@/components/story-detail-content";
 import { SITE_NAME } from "@/lib/site";
@@ -8,13 +9,15 @@ type StoryDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
+const getStoryDetail = cache((id: string) => fetchStoryDetail(id));
+
 export async function generateMetadata({
   params,
 }: StoryDetailPageProps): Promise<Metadata> {
   const { id } = await params;
 
   try {
-    const story = await fetchStoryDetail(id);
+    const story = await getStoryDetail(id);
     const description =
       story.timeline?.[0]?.summary?.[0] ??
       "Read the latest curated GenAI story coverage.";
@@ -55,7 +58,7 @@ export default async function StoryDetailPage({
 
   let story;
   try {
-    story = await fetchStoryDetail(id);
+    story = await getStoryDetail(id);
   } catch (error) {
     if (error instanceof Error && error.message.includes("(404)")) {
       notFound();

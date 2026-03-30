@@ -3,7 +3,7 @@ import { type StoriesResponse, fetchStories } from "@/lib/news-api";
 import { SOURCE_MAP } from "@/lib/constants";
 import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function Home() {
   let stories: StoriesResponse | null = null;

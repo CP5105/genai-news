@@ -337,7 +337,26 @@ export default function StoryFeed({
       return;
     }
 
-    savePersistedStoryFeedState(buildPersistedState(window.scrollY));
+    const persistedState = buildPersistedState(window.scrollY);
+    const browserWindow = window as Window;
+
+    if ("requestIdleCallback" in browserWindow) {
+      const idleId = browserWindow.requestIdleCallback(() => {
+        savePersistedStoryFeedState(persistedState);
+      }, { timeout: 1000 });
+
+      return () => {
+        browserWindow.cancelIdleCallback(idleId);
+      };
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      savePersistedStoryFeedState(persistedState);
+    }, 0);
+
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
   }, [buildPersistedState, hasHydratedState]);
 
   const handleCardNavigate = (storyId: string) => {

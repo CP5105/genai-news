@@ -77,6 +77,8 @@ button:focus-visible {
   border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 24rem;
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease,
