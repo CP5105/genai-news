@@ -3,19 +3,24 @@
 import { type KeyboardEvent, useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { type StoryItem, fetchStories, formatDate } from "@/lib/news-api";
+import {
+  STORY_READ_STATE_CHANGE_EVENT,
+  STORY_READ_STATE_STORAGE_KEY,
+  type StoryReadState,
+  readStoryReadState,
+} from "@/lib/story-read-state";
 import StoryImageCarousel from "@/components/story-image-carousel";
 import SourceDropdown from "@/components/source-dropdown";
 import { SOURCE_MAP } from "@/lib/constants";
 
 type PersistedStoryFeedState = {
-  version: 4;
+  version: 5;
   items: StoryItem[];
   page: number;
   hasNext: boolean;
   selectedCollections: string[];
   searchQuery: string;
   searchInput: string;
-  followUpOnly: boolean;
   activeImageByStory: Record<string, number>;
   scrollY?: number;
 };
@@ -34,7 +39,7 @@ function readPersistedStoryFeedState(): PersistedStoryFeedState | null {
     }
 
     const parsed = JSON.parse(raw) as PersistedStoryFeedState;
-    if (parsed.version !== 4) {
+    if (parsed.version !== 5) {
       return null;
     }
 
@@ -79,7 +84,7 @@ export default function StoryFeed({
   const [selectedCollections, setSelectedCollections] = useState<string[]>(initialCollections);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [followUpOnly, setFollowUpOnly] = useState(false);
+  const [storyReadState, setStoryReadState] = useState<StoryReadState>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loadError, setLoadError] = useState("");
@@ -99,14 +104,13 @@ export default function StoryFeed({
 
   const buildPersistedState = useCallback(
     (scrollY?: number): PersistedStoryFeedState => ({
-      version: 4,
+      version: 5,
       items,
       page,
       hasNext,
       selectedCollections,
       searchQuery,
       searchInput,
-      followUpOnly,
       activeImageByStory,
       scrollY,
     }),
@@ -115,7 +119,6 @@ export default function StoryFeed({
       hasNext,
       items,
       page,
-      followUpOnly,
       searchInput,
       searchQuery,
       selectedCollections,
@@ -132,7 +135,6 @@ export default function StoryFeed({
       setSelectedCollections(storedState.selectedCollections);
       setSearchQuery(storedState.searchQuery);
       setSearchInput(storedState.searchInput);
-      setFollowUpOnly(storedState.followUpOnly);
       setActiveImageByStory(storedState.activeImageByStory);
       if (typeof storedState.scrollY === "number") {
         setPendingScrollRestore(storedState.scrollY);
@@ -142,21 +144,55 @@ export default function StoryFeed({
     setHasHydratedState(true);
   }, []);
 
+  const syncStoryReadState = useCallback(() => {
+    setStoryReadState(readStoryReadState());
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    syncStoryReadState();
+
+    const handleStoryReadStateChange = () => {
+      syncStoryReadState();
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key && event.key !== STORY_READ_STATE_STORAGE_KEY) {
+        return;
+      }
+
+      syncStoryReadState();
+    };
+
+    window.addEventListener(
+      STORY_READ_STATE_CHANGE_EVENT,
+      handleStoryReadStateChange as EventListener,
+    );
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener(
+        STORY_READ_STATE_CHANGE_EVENT,
+        handleStoryReadStateChange as EventListener,
+      );
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [syncStoryReadState]);
+
   const getFetchOptions = useCallback(() => {
     const allSelected = selectedCollections.length === Object.keys(SOURCE_MAP).length;
     const options: {
       collections?: string[];
       search?: string;
-      hasFollowUp?: boolean;
     } = allSelected ? {} : { collections: selectedCollections };
     if (searchQuery.trim()) {
       options.search = searchQuery.trim();
     }
-    if (followUpOnly) {
-      options.hasFollowUp = true;
-    }
     return options;
-  }, [followUpOnly, selectedCollections, searchQuery]);
+  }, [selectedCollections, searchQuery]);
 
   const loadMore = async () => {
     if (isLoading || !hasNext || selectedCollections.length === 0) {
@@ -220,7 +256,6 @@ export default function StoryFeed({
   const filterKey = JSON.stringify({
     selectedCollections,
     searchQuery: searchQuery.trim(),
-    followUpOnly,
   });
 
   useEffect(() => {
@@ -317,6 +352,11 @@ export default function StoryFeed({
     setSearchQuery(searchInput);
   };
 
+  const hasUnreadUpdate = (story: StoryItem) =>
+    story.has_follow_up &&
+    storyReadState[story.id]?.seenLatestTimelineEventAt !==
+      story.latest_timeline_event_at;
+
   return (
     <section aria-label="Story feed">
       {/* Feed header */}
@@ -374,27 +414,6 @@ export default function StoryFeed({
           />
           <button
             type="button"
-            onClick={() => setFollowUpOnly((prev) => !prev)}
-            aria-pressed={followUpOnly}
-            className="cursor-pointer border px-3 py-[0.45rem] rounded-[2px] outline-none transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-            style={{
-              borderColor: followUpOnly
-                ? "var(--primary-border)"
-                : "var(--border-strong)",
-              background: followUpOnly
-                ? "var(--primary-glow)"
-                : "var(--surface)",
-              color: followUpOnly ? "var(--primary)" : "var(--foreground)",
-              fontFamily: "var(--font-mono), monospace",
-              fontSize: "0.72rem",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-            }}
-          >
-            Ongoing Stories
-          </button>
-          <button
-            type="button"
             onClick={refreshLatest}
             disabled={isRefreshing || isLoading}
             className="btn-ghost"
@@ -438,10 +457,6 @@ export default function StoryFeed({
           ) : searchQuery ? (
             <span className="text-gray-500">
               No stories found matching &quot;{searchQuery}&quot;. Try different keywords.
-            </span>
-          ) : followUpOnly ? (
-            <span className="text-gray-500">
-              No ongoing stories available right now.
             </span>
           ) : (
             "No stories available."
@@ -494,6 +509,9 @@ export default function StoryFeed({
             />
 
             <div className="flex flex-1 flex-col p-5">
+              {hasUnreadUpdate(story) ? (
+                <p className="story-card-status-badge">New Update</p>
+              ) : null}
               <h3 className="story-card-headline">{story.headline}</h3>
               <p className="story-card-meta mt-auto pt-2">
                 {formatDate(story.latest_timeline_event_at)}

@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 import { formatDate, type StoryDetail } from "@/lib/news-api";
+import {
+  getStoryReadStateEntry,
+  setStoryReadStateEntry,
+} from "@/lib/story-read-state";
 import StoryImageCarousel from "@/components/story-image-carousel";
 
 type StoryDetailContentProps = {
@@ -29,10 +34,135 @@ function formatTimelineType(value: string): string {
 export default function StoryDetailContent({ story }: StoryDetailContentProps) {
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
+  const timelineSectionRef = useRef<HTMLElement | null>(null);
+  const hasAutoMarkedRef = useRef(false);
   const timelineEvents = story.timeline.filter(
     (event) => event.summary.length > 0,
   );
+  const hasFollowUp = story.timeline.length > 1;
   const hasTimelineRail = timelineEvents.length > 1;
+
+  useEffect(() => {
+    hasAutoMarkedRef.current = false;
+
+    if (
+      typeof window === "undefined" ||
+      !hasFollowUp ||
+      !story.latest_timeline_event_at
+    ) {
+      return;
+    }
+
+    const existingEntry = getStoryReadStateEntry(story.id);
+    if (
+      existingEntry?.seenLatestTimelineEventAt === story.latest_timeline_event_at
+    ) {
+      return;
+    }
+
+    let visibleElapsedMs = 0;
+    let hasEngaged = window.scrollY > 120;
+    let hasSeenTimeline = false;
+
+    const checkTimelineVisibility = () => {
+      const section = timelineSectionRef.current;
+      if (!section) {
+        return;
+      }
+
+      const rect = section.getBoundingClientRect();
+      if (
+        rect.top < window.innerHeight * 0.85 &&
+        rect.bottom > window.innerHeight * 0.15
+      ) {
+        hasSeenTimeline = true;
+      }
+    };
+
+    const maybeMarkUpToDate = () => {
+      if (hasAutoMarkedRef.current) {
+        return;
+      }
+
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      if (visibleElapsedMs < 5000) {
+        return;
+      }
+
+      if (!hasEngaged && !hasSeenTimeline) {
+        return;
+      }
+
+      hasAutoMarkedRef.current = true;
+
+      const previousEntry = getStoryReadStateEntry(story.id);
+      setStoryReadStateEntry(story.id, {
+        seenLatestTimelineEventAt: story.latest_timeline_event_at,
+      });
+
+      toast("Marked up to date", {
+        description: "This story will no longer be highlighted on the homepage.",
+        action: {
+          label: "Undo",
+          onClick: () => {
+            setStoryReadStateEntry(story.id, previousEntry);
+          },
+        },
+      });
+    };
+
+    const handleScroll = () => {
+      if (window.scrollY > 120) {
+        hasEngaged = true;
+      }
+
+      checkTimelineVisibility();
+      maybeMarkUpToDate();
+    };
+
+    const handlePointerDown = () => {
+      hasEngaged = true;
+      maybeMarkUpToDate();
+    };
+
+    const handleKeyDown = () => {
+      hasEngaged = true;
+      maybeMarkUpToDate();
+    };
+
+    const handleVisibilityChange = () => {
+      checkTimelineVisibility();
+      maybeMarkUpToDate();
+    };
+
+    checkTimelineVisibility();
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      visibleElapsedMs += 1000;
+      checkTimelineVisibility();
+      maybeMarkUpToDate();
+    }, 1000);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [hasFollowUp, story.id, story.latest_timeline_event_at]);
 
   return (
     <main className="mx-auto w-[min(1100px,94vw)] py-8 md:py-12">
@@ -64,7 +194,11 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
           <h1 className="detail-headline">{story.headline}</h1>
 
           {timelineEvents.length > 0 ? (
-            <section className="detail-timeline" aria-label="Story timeline">
+            <section
+              ref={timelineSectionRef}
+              className="detail-timeline"
+              aria-label="Story timeline"
+            >
               <h2 className="sr-only">Timeline</h2>
 
               <div

@@ -2,6 +2,7 @@ export type StoryItem = {
   id: string;
   headline: string;
   latest_timeline_event_at: string;
+  has_follow_up: boolean;
   cover_images: string[];
 };
 
@@ -67,10 +68,9 @@ export async function fetchStories(
   options?: {
     collections?: string[];
     search?: string;
-    hasFollowUp?: boolean;
   } & RequestInit,
 ): Promise<StoriesResponse> {
-  const { collections, search, hasFollowUp, ...init } = options || {};
+  const { collections, search, ...init } = options || {};
   let url = `/api/stories?page=${page}`;
 
   if (collections && collections.length > 0) {
@@ -81,10 +81,6 @@ export async function fetchStories(
 
   if (search) {
     url += `&search=${encodeURIComponent(search)}`;
-  }
-
-  if (hasFollowUp) {
-    url += "&has_follow_up=true";
   }
 
   return fetchJson<StoriesResponse>(url, init);
