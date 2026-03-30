@@ -202,6 +202,8 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
           prevButtonClassName="absolute top-1/2 left-4 -translate-y-1/2 cursor-pointer rounded-sm bg-black/60 px-3 py-2 text-sm text-white/85 transition-colors duration-200 hover:bg-black/80"
           nextButtonClassName="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer rounded-sm bg-black/60 px-3 py-2 text-sm text-white/85 transition-colors duration-200 hover:bg-black/80"
           dotsWrapperClassName="absolute right-4 bottom-4 flex gap-1.5 rounded-sm bg-black/50 px-2 py-1"
+          imageLoading="eager"
+          imageSizes="(min-width: 1180px) 1100px, 94vw"
         />
 
         <div className="p-6 md:p-9 lg:p-11">

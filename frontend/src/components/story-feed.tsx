@@ -1,17 +1,17 @@
 "use client";
 
-import { type KeyboardEvent, useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { type StoryItem, fetchStories, formatDate } from "@/lib/news-api";
+import { type StoryItem, fetchStories } from "@/lib/news-api";
 import {
   STORY_READ_STATE_CHANGE_EVENT,
   STORY_READ_STATE_STORAGE_KEY,
   type StoryReadState,
   readStoryReadState,
 } from "@/lib/story-read-state";
-import StoryImageCarousel from "@/components/story-image-carousel";
 import SourceDropdown from "@/components/source-dropdown";
 import { SOURCE_MAP } from "@/lib/constants";
+import StoryCard from "@/components/story-card";
 
 type PersistedStoryFeedState = {
   version: 5;
@@ -98,9 +98,9 @@ export default function StoryFeed({
 
   const previousFilterKeyRef = useRef<string | null>(null);
 
-  const setActiveImage = (storyId: string, index: number) => {
+  const setActiveImage = useCallback((storyId: string, index: number) => {
     setActiveImageByStory((prev) => ({ ...prev, [storyId]: index }));
-  };
+  }, []);
 
   const buildPersistedState = useCallback(
     (scrollY?: number): PersistedStoryFeedState => ({
@@ -359,12 +359,12 @@ export default function StoryFeed({
     };
   }, [buildPersistedState, hasHydratedState]);
 
-  const handleCardNavigate = (storyId: string) => {
+  const handleCardNavigate = useCallback((storyId: string) => {
     if (typeof window !== "undefined") {
       savePersistedStoryFeedState(buildPersistedState(window.scrollY));
     }
     router.push(`/story/${storyId}`);
-  };
+  }, [buildPersistedState, router]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -491,66 +491,15 @@ export default function StoryFeed({
 
       <div className="grid gap-5 md:grid-cols-2">
         {items.map((story, index) => (
-          <article
+          <StoryCard
             key={story.id}
-            role="link"
-            tabIndex={0}
-            aria-label={`Open story: ${story.headline}`}
-            onClick={(event) => {
-              const target = event.target as HTMLElement;
-              if (target.closest("button,a")) {
-                return;
-              }
-              handleCardNavigate(story.id);
-            }}
-            onKeyDown={(event: KeyboardEvent<HTMLElement>) => {
-              const target = event.target as HTMLElement;
-              if (target.closest("button,a")) {
-                return;
-              }
-
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                handleCardNavigate(story.id);
-              }
-            }}
-            className="story-card card-enter flex h-full cursor-pointer flex-col focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-            style={{ animationDelay: `${(index % 10) * 65}ms` }}
-          >
-            <StoryImageCarousel
-              images={story.cover_images}
-              activeIndex={activeImageByStory[story.id] ?? 0}
-              onChange={(nextIndex) => setActiveImage(story.id, nextIndex)}
-              heightClassName="h-52"
-              prevButtonClassName="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer rounded-sm bg-black/60 px-2.5 py-1.5 text-xs text-white/85 transition-colors duration-200 hover:bg-black/80"
-              nextButtonClassName="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer rounded-sm bg-black/60 px-2.5 py-1.5 text-xs text-white/85 transition-colors duration-200 hover:bg-black/80"
-              dotsWrapperClassName="absolute right-3 bottom-3 flex gap-1.5 rounded-sm bg-black/50 px-2 py-1"
-            />
-
-            <div className="flex flex-1 flex-col p-5">
-              <h3 className="story-card-headline">{story.headline}</h3>
-              <div className="story-card-meta mt-auto pt-2">
-                {hasUnreadUpdate(story) ? (
-                  <>
-                    <span className="story-card-meta-status">
-                      <span
-                        className="story-card-meta-dot"
-                        aria-hidden="true"
-                      />
-                      Updated
-                    </span>
-                    <span
-                      className="story-card-meta-separator"
-                      aria-hidden="true"
-                    >
-                      ·
-                    </span>
-                  </>
-                ) : null}
-                <span>{formatDate(story.latest_timeline_event_at)}</span>
-              </div>
-            </div>
-          </article>
+            story={story}
+            index={index}
+            activeImage={activeImageByStory[story.id] ?? 0}
+            hasUnreadUpdate={hasUnreadUpdate(story)}
+            onNavigate={handleCardNavigate}
+            onImageChange={setActiveImage}
+          />
         ))}
       </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { MouseEvent } from "react";
 
 type StoryImageCarouselProps = {
@@ -10,6 +11,8 @@ type StoryImageCarouselProps = {
   prevButtonClassName: string;
   nextButtonClassName: string;
   dotsWrapperClassName: string;
+  imageLoading?: "eager" | "lazy";
+  imageSizes?: string;
 };
 
 export default function StoryImageCarousel({
@@ -20,6 +23,8 @@ export default function StoryImageCarousel({
   prevButtonClassName,
   nextButtonClassName,
   dotsWrapperClassName,
+  imageLoading = "lazy",
+  imageSizes = "100vw",
 }: StoryImageCarouselProps) {
   const totalImages = images.length;
   const currentImage =
@@ -31,11 +36,16 @@ export default function StoryImageCarousel({
   };
 
   return (
-    <div className={`relative ${heightClassName}`}>
+    <div className={`relative overflow-hidden ${heightClassName}`}>
       {currentImage ? (
-        <div
-          className="h-full w-full bg-cover bg-center"
-          style={{ backgroundImage: `url('${currentImage}')` }}
+        <Image
+          src={currentImage}
+          alt=""
+          fill
+          sizes={imageSizes}
+          loading={imageLoading}
+          priority={imageLoading === "eager"}
+          className="object-cover object-center"
           aria-hidden="true"
         />
       ) : (
