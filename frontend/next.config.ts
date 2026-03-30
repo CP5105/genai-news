@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cassette.sphdigital.com.sg",
       },
+      {
+        protocol: "https",
+        hostname: "dam.mediacorp.sg",
+      },
     ],
   },
   async rewrites() {
