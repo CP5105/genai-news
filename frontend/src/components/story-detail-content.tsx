@@ -16,7 +16,7 @@ function formatTimelineType(value: string): string {
   }
 
   if (value === "initial") {
-    return "First report";
+    return "Initial Report";
   }
 
   if (value === "update") {
@@ -59,7 +59,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
         />
 
         <div className="p-6 md:p-9 lg:p-11">
-          <p className="detail-section-label">◆ Story Brief</p>
+          <p className="detail-section-label">◆ Overview</p>
 
           <h1 className="detail-headline">{story.headline}</h1>
 

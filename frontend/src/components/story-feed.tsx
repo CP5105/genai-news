@@ -326,7 +326,7 @@ export default function StoryFeed({
             className="story-card-label"
             style={{ marginBottom: 0, fontSize: "0.92rem" }}
           >
-            ◆ Latest dispatches
+            ◆ Latest Stories
           </p>
         </div>
 
@@ -391,7 +391,7 @@ export default function StoryFeed({
               textTransform: "uppercase",
             }}
           >
-            Has Follow-ups
+            Ongoing Stories
           </button>
           <button
             type="button"
@@ -433,25 +433,25 @@ export default function StoryFeed({
         <div className="empty-state">
           {selectedCollections.length === 0 ? (
             <span className="text-gray-500">
-              No dispatches available. Please select at least one source.
+              No stories available. Please select at least one source.
             </span>
           ) : searchQuery ? (
             <span className="text-gray-500">
-              No dispatches found matching &quot;{searchQuery}&quot;. Try different keywords.
+              No stories found matching &quot;{searchQuery}&quot;. Try different keywords.
             </span>
           ) : followUpOnly ? (
             <span className="text-gray-500">
-              No follow-up stories available right now.
+              No ongoing stories available right now.
             </span>
           ) : (
-            "No dispatches available."
+            "No stories available."
           )}
         </div>
       ) : null}
 
       {items.length === 0 && isLoading ? (
         <div className="empty-state animate-pulse text-gray-500">
-          Loading dispatches...
+          Loading stories...
         </div>
       ) : null}
 
@@ -511,7 +511,7 @@ export default function StoryFeed({
             disabled={isLoading}
             className="btn-primary"
           >
-            {isLoading ? "Loading..." : "Load more dispatches"}
+            {isLoading ? "Loading..." : "Load More Stories"}
           </button>
         ) : items.length > 0 ? (
           <p
@@ -523,7 +523,7 @@ export default function StoryFeed({
               color: "var(--muted)",
             }}
           >
-            — End of dispatches —
+            — End of stories —
           </p>
         ) : null}
 
