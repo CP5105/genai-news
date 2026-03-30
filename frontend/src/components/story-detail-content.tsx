@@ -129,7 +129,7 @@ export default function StoryDetailContent({ story }: StoryDetailContentProps) {
       dismissActiveReadStatusToast();
       activeReadStatusToastIdRef.current = toast.custom(
         () => <ReadStatusToast onUndo={() => handleUndoReadStatus(previousEntry)} />,
-        { duration: 5000 },
+        { duration: 5000, className: "detail-toast-shell" },
       );
     };
 

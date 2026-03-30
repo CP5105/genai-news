@@ -358,6 +358,12 @@ button:focus-visible {
   box-shadow: 0 16px 36px rgba(26, 20, 16, 0.12);
 }
 
+.detail-toast-shell {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
 .detail-toast-copy {
   min-width: 0;
 }
