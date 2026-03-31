@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JetBrains_Mono, Outfit, Playfair_Display } from "next/font/google";
-import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { AppToaster } from "@/components/app-toaster";
 import "./globals.css";
 
@@ -147,26 +147,6 @@ export default function RootLayout({
           </div>
         </header>
         {children}
-        <footer className="mx-auto w-[min(1100px,94vw)] border-t border-[var(--border)] py-8">
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.72rem",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "var(--muted)",
-            }}
-          >
-            Contact:
-            {" "}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              style={{ color: "var(--heading)", textDecoration: "underline" }}
-            >
-              {CONTACT_EMAIL}
-            </a>
-          </p>
-        </footer>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import StoryFeed from "@/components/story-feed";
 import { type StoriesResponse, fetchStories } from "@/lib/news-api";
 import { SOURCE_MAP } from "@/lib/constants";
-import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const revalidate = 60;
 
@@ -38,7 +38,6 @@ export default async function Home() {
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
-      email: CONTACT_EMAIL,
     },
   };
 

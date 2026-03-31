@@ -6,7 +6,6 @@ function requireEnv(name: string): string {
   return value;
 }
 
-export const CONTACT_EMAIL = requireEnv("NEXT_PUBLIC_CONTACT_EMAIL");
 export const SITE_URL = requireEnv("NEXT_PUBLIC_SITE_URL");
 
 export const SITE_NAME = "GenAI News";
