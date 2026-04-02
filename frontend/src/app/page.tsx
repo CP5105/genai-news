@@ -3,8 +3,6 @@ import { type StoriesResponse, fetchStories } from "@/lib/news-api";
 import { SOURCE_MAP } from "@/lib/constants";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
-export const revalidate = 60;
-
 export default async function Home() {
   let stories: StoriesResponse | null = null;
   let errorMessage = "";
@@ -12,7 +10,7 @@ export default async function Home() {
   const defaultCollections = Object.values(SOURCE_MAP);
 
   try {
-    stories = await fetchStories(1);
+    stories = await fetchStories(1, { cache: "no-store" });
   } catch (error) {
     errorMessage =
       error instanceof Error ? error.message : "Could not load stories";
