@@ -8,9 +8,9 @@ Backend:
 - Required values:
 
 ```env
-MONGO_URI=...
-MONGO_DATABASE=...
-MONGO_COLLECTION=...
+MONGO_URI=<MongoDB Atlas connection string>
+MONGO_DATABASE=<database for stories shown in the product>
+MONGO_COLLECTION=<collection for stories shown in the product>
 ```
 
 Frontend:
